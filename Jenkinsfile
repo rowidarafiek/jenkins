@@ -24,7 +24,9 @@ pipeline {
         stage('Run Unit Tests') {
             steps {
                 dir('jenkins') {
-                    UnitTest.run()  // Calls UnitTest.groovy
+                    script {
+                        UnitTest.run()
+                    }
                 }
             }
         }
@@ -32,7 +34,9 @@ pipeline {
         stage('Build Application') {
             steps {
                 dir('jenkins') {
-                    buildApp.run()  // Calls buildApp.groovy
+                    script {
+                        buildApp.run()
+                    }
                 }
             }
         }
@@ -40,7 +44,9 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 dir('jenkins') {
-                    buildImage.run(IMAGE_NAME, BUILD_NUMBER)  // Calls buildImage.groovy
+                    script {
+                        buildImage.run(IMAGE_NAME, BUILD_NUMBER)
+                    }
                 }
             }
         }
@@ -48,7 +54,9 @@ pipeline {
         stage('Scan Docker Image') {
             steps {
                 dir('jenkins') {
-                    scanImage.run(IMAGE_NAME, BUILD_NUMBER)  // Calls scanImage.groovy
+                    script {
+                        scanImage.run(IMAGE_NAME, BUILD_NUMBER)
+                    }
                 }
             }
         }
@@ -56,20 +64,26 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 dir('jenkins') {
-                    pushImage.run(IMAGE_NAME, BUILD_NUMBER, 'dockerhub-cred')  // Calls pushImage.groovy
+                    script {
+                        pushImage.run(IMAGE_NAME, BUILD_NUMBER, 'dockerhub-cred')
+                    }
                 }
             }
         }
 
         stage('Remove Local Docker Image') {
             steps {
-                removeImage.run(IMAGE_NAME, BUILD_NUMBER)  // Calls removeImage.groovy
+                script {
+                    removeImage.run(IMAGE_NAME, BUILD_NUMBER)
+                }
             }
         }
 
         stage('Deploy to Kubernetes') {
             steps {
-                deployOnK8s.run(IMAGE_NAME, BUILD_NUMBER)  // Calls deployOnK8s.groovy
+                script {
+                    deployOnK8s.run(IMAGE_NAME, BUILD_NUMBER)
+                }
             }
         }
     }
