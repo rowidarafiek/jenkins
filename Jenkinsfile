@@ -1,13 +1,13 @@
 @Library('shared-lib') _
 
 pipeline {
-    agent { label 'linux-docker' }  // ← Use && not space
-    
+    agent { label 'linux-docker' }
+
     environment {
         IMAGE_NAME = 'rowidarafiek/app'
         DOCKER_CREDS = 'dockerhub-cred'
     }
-    
+
     stages {
         stage('Clone Repository') {
             steps {
@@ -26,27 +26,27 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Run Unit Tests') {
             steps {
                 dir('jenkins') {
                     script {
-                        UnitTest()  // ← Calls vars/unitTest.groovy
+                        UnitTest()
                     }
                 }
             }
         }
-        
+
         stage('Build Application') {
             steps {
                 dir('jenkins') {
                     script {
-                        buildApp()  // ← Calls vars/buildApp.groovy
+                        buildApp()
                     }
                 }
             }
         }
-        
+
         stage('Build Docker Image') {
             steps {
                 dir('jenkins') {
@@ -56,17 +56,18 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Scan Docker Image') {
             steps {
                 dir('jenkins') {
                     script {
-                        scanImage(IMAGE_NAME, BUILD_NUMBER)
+                        // Use the dynamic build number, not hardcoded
+                        callSimple(IMAGE_NAME, BUILD_NUMBER)
                     }
                 }
             }
         }
-        
+
         stage('Push Docker Image') {
             steps {
                 script {
@@ -74,7 +75,7 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Remove Local Docker Image') {
             steps {
                 script {
@@ -82,7 +83,7 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Deploy to Kubernetes') {
             steps {
                 script {
@@ -91,7 +92,7 @@ pipeline {
             }
         }
     }
-    
+
     post {
         success {
             echo "Pipeline completed successfully!"
