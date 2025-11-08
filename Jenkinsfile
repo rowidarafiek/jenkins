@@ -1,7 +1,7 @@
 @Library('shared-lib') _
 
 pipeline {
-    agent { label 'linux-docker' }
+    agent { label 'linux && docker' }  // ← Use && not space
     
     environment {
         IMAGE_NAME = 'rowidarafiek/app'
@@ -31,8 +31,7 @@ pipeline {
             steps {
                 dir('jenkins') {
                     script {
-                        // Call shared library function
-                        unitTest()
+                        unitTest()  // ← Calls vars/unitTest.groovy
                     }
                 }
             }
@@ -42,8 +41,7 @@ pipeline {
             steps {
                 dir('jenkins') {
                     script {
-                        // Call shared library function
-                        buildApp()
+                        buildApp()  // ← Calls vars/buildApp.groovy
                     }
                 }
             }
@@ -53,7 +51,6 @@ pipeline {
             steps {
                 dir('jenkins') {
                     script {
-                        // Call shared library function with parameters
                         buildImage(IMAGE_NAME, BUILD_NUMBER)
                     }
                 }
@@ -64,7 +61,6 @@ pipeline {
             steps {
                 dir('jenkins') {
                     script {
-                        // Call shared library function
                         scanImage(IMAGE_NAME, BUILD_NUMBER)
                     }
                 }
@@ -74,7 +70,6 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script {
-                    // Call shared library function
                     pushImage(IMAGE_NAME, BUILD_NUMBER, DOCKER_CREDS)
                 }
             }
@@ -83,7 +78,6 @@ pipeline {
         stage('Remove Local Docker Image') {
             steps {
                 script {
-                    // Call shared library function
                     removeImage(IMAGE_NAME, BUILD_NUMBER)
                 }
             }
@@ -92,7 +86,6 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 script {
-                    // Call shared library function
                     deployOnK8s(IMAGE_NAME, BUILD_NUMBER)
                 }
             }
@@ -110,8 +103,8 @@ pipeline {
         }
         always {
             echo "Pipeline finished"
-            // Clean up workspace if needed
             cleanWs(deleteDirs: true, disableDeferredWipeout: true, notFailBuild: true)
         }
     }
 }
+
