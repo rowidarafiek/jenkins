@@ -61,7 +61,6 @@ pipeline {
             steps {
                 dir('jenkins') {
                     script {
-                        // Use the dynamic build number, not hardcoded
                         callSimple(IMAGE_NAME, BUILD_NUMBER)
                     }
                 }
@@ -70,24 +69,30 @@ pipeline {
 
         stage('Push Docker Image') {
             steps {
-                script {
-                    pushImage(IMAGE_NAME, BUILD_NUMBER, DOCKER_CREDS)
+                dir('jenkins') {
+                    script {
+                        pushImage(IMAGE_NAME, BUILD_NUMBER, DOCKER_CREDS)
+                    }
                 }
             }
         }
 
         stage('Remove Local Docker Image') {
             steps {
-                script {
-                    removeImage(IMAGE_NAME, BUILD_NUMBER)
+                dir('jenkins') {
+                    script {
+                        removeImage(IMAGE_NAME, BUILD_NUMBER)
+                    }
                 }
             }
         }
 
         stage('Deploy to Kubernetes') {
             steps {
-                script {
-                    deployOnK8s(IMAGE_NAME, BUILD_NUMBER)
+                dir('jenkins') {
+                    script {
+                        deployOnK8s(IMAGE_NAME, BUILD_NUMBER)
+                    }
                 }
             }
         }
