@@ -1,5 +1,8 @@
-def call(String imageName, String tag) {
-    echo "Removing local image ${imageName}:${tag}"
-    sh "docker rmi ${imageName}:${tag} || true"
+def call(String imageName, String buildNumber) {
+    echo "Removing local Docker images..."
+    sh """
+        docker rmi ${imageName}:${buildNumber} || true
+        docker rmi ${imageName}:latest || true
+        echo "Local images removed"
+    """
 }
-

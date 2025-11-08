@@ -1,10 +1,17 @@
 def call() {
-    if (fileExists('pom.xml')) {
-        sh 'mvn test'
-    } else if (fileExists('build.gradle')) {
-        sh 'gradle test'
-    } else {
-        echo 'No build file found'
-    }
+    echo "Running unit tests..."
+    sh '''
+        if [ -f package.json ]; then
+            echo "Running npm tests..."
+            npm test
+        elif [ -f pom.xml ]; then
+            echo "Running Maven tests..."
+            mvn test
+        elif [ -f requirements.txt ]; then
+            echo "Running Python tests..."
+            python -m pytest
+        else
+            echo "No test configuration found, skipping tests"
+        fi
+    '''
 }
-
